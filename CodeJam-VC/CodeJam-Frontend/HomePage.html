@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceCal</title>
+    <link rel="stylesheet" href="/static/HomePage.css">
+    <script src="https://kit.fontawesome.com/d5e922ec28.js" crossorigin="anonymous"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+    const GOOGLE_CLIENT_ID = "31860016884-kj5edhvld3ujudmjr9pl3j1oaddnv63d.apps.googleusercontent.com";
+
+window.onload = function () {
+  const loginButton = document.getElementById("login-button");
+
+  if (loginButton) {
+    loginButton.addEventListener("click", () => {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      google.accounts.id.prompt();
+    });
+  }
+};
+
+function handleCredentialResponse(response) {
+  console.log("Encoded JWT ID token: " + response.credential);
+  // You can decode the token and handle login here
+}
+    </script>
+</head>
+
+
+
+<body>
+ <div class="background">
+        <header>
+            <div class="icon-container">
+                <i class="fa-solid fa-microphone" style="color: white; font-size: 35px;"></i>
+            </div>
+            <div class="title-left">VoiceCal </div>
+            <div class="icons2">
+                <button class="home1"><i class="fa-solid fa-house" style="font-size: 50px; color:white; margin-left: 2%;"></i></button>
+                <button class="mic2" onclick="window.location.href='mic.html'" ><i class="fa-solid fa-microphone" style="font-size: 50px; color:white; margin-left: 40%;"></i></button>
+                <a href="https://calendar.google.com/calendar/u/0/r/week" class="calender1"><i class="fa-solid fa-calendar" style="font-size: 50px; color:white; margin-left: 40%; padding-left: 45%;"></i></a>
+            </div>
+        </header>
+
+        <div class="left-main-section">
+            <p class="paragraph">Welcome To VoiceCal Scheduler</p>
+            <p class="bottom-paragraph">Schedule your events with just your voice!
+                Simply speak, and we"ll add it to your calender.</p>
+
+
+            <div class="right-section">
+                <div class="logo-background"> <a class="same-button" href="mic.html"></button><img class="company-logo" src="logo.png" alt="vc"></a></div>
+                <div class="Sign-In-Cover">
+                <button class="Sign-In-Button"></button>
+            </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+   <script>
+    const GOOGLE_CLIENT_ID = "31860016884-nr4kgcvtpkj9iib9r1cog4a4ljos8uil.apps.googleusercontent.com.apps.googleusercontent.com";
+    let googleAccessToken = null;
+
+    window.onload = function() {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById("Sign-In-Button"),
+        { theme: "outline", size: "large" }
+      );
+
+      google.accounts.id.prompt(); // show prompt automatically
+    };
+
+    function handleCredentialResponse(response) {
+      // Send ID token to backend to exchange for access token
+      fetch("/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_token: response.credential })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Access Token from backend:", data.access_token);
+        googleAccessToken = data.access_token;
+        document.getElementById("microphone-section").style.display = "block";
+        document.getElementById("Sign-In-Button").style.display = "none";
+      });
+    }
+    </script>
+</body>
+</html>

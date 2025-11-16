@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VoiceCal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/d5e922ec28.js" crossorigin="anonymous"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 20% 0%, #5e3cfb 0, #3b1d76 40%, #991d75 100%);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 40px 60px;
+    }
+
+    /* Top bar */
+    .top-bar {
+      position: absolute;
+      top: 24px;
+      left: 30px;
+      right: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #f5f5f5;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .back:hover{
+      transform: scale(1.1);
+    }
+    .back:active{
+      transform: scale(0.95);
+    }
+
+    .back-arrow {
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid #f5f5f5;
+      border-bottom: 2px solid #f5f5f5;
+      transform: rotate(45deg);
+    }
+
+    .app-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff5bb6, #b249ff);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .app-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Center content */
+    .content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+      padding-bottom: 130px;
+    }
+
+    .title {
+      font-size: 56px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      opacity: 0.85;
+    }
+
+    .record-button {
+      margin-top: 40px;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 0%, #ff8bd1, #f53486 40%, #b63cff 100%);
+      box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.45),
+        0 0 0 18px rgba(255, 255, 255, 0.03);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .mic-button {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: radial-gradient(circle at 30% 0%, #ff88c9, #ec2e93 40%, #a537ff 100%);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45),
+        0 0 0 14px rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mic-button:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.55),
+        0 0 0 16px rgba(255, 255, 255, 0.05);
+    }
+
+    .mic-button:active {
+      transform: scale(0.96);
+      box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 12px rgba(255, 255, 255, 0.03);
+    }
+
+    .mic-button.recording {
+      animation: ripple 0.7s linear infinite;
+      transform: scale(0.96);
+    }
+
+    @keyframes ripple {
+      0% {
+        box-shadow:
+          0 12px 40px rgba(0, 0, 0, 0.5),
+          0 0 0 12px rgba(255, 255, 255, 0.03);
+      }
+      50% {
+        box-shadow:
+          0 12px 100px rgba(0, 0, 0, 0.5),
+          0 0 0 60px rgba(255, 255, 255, 0.03);
+      }
+      100% {
+        box-shadow:
+          0 12px 130px rgba(0, 0, 0, 0.5),
+          0 0 0 80px rgba(255, 255, 255, 0.03);
+      }
+    }
+
+    /* -------- SUCCESS POPUP -------- */
+    #success-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 26px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+      font-size: 16px;
+      font-weight: 600;
+      color: #d4ffd8;
+
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #success-popup.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- SUCCESS POPUP -->
+
+
+  <div class="screen">
+    <div class="top-bar">
+      <div class="back">
+        <span class="back-arrow"></span>
+        <a href="/static/HomePage.html" class="back-link"><span style="font-size: xx-large; color: whitesmoke">Back</span></a>
+      </div>
+      <div class="app-chip">
+        <span class="app-dot"></span>
+        <span>VoiceCal</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1 class="title">Tap to Speak</h1>
+      <p class="subtitle">Press the microphone button to start recording</p>
+
+      <div class="record-button">
+        <button class="mic-button" id="recordBtn">
+          <i class="fa-solid fa-microphone" style="color: white; font-size: 100px;"></i>
+        </button>
+          <div id="success-popup">✔ Event added to your Google Calendar</div>
+      </div>
+
+      <br><br>
+      <p id="output"></p>
+    </div>
+  </div>
+
+  <script>
+    function showSuccessPopup() {
+      const box = document.getElementById("success-popup");
+      box.classList.add("show");
+
+      setTimeout(() => {
+        box.classList.remove("show");
+      }, 2500);
+    }
+
+    let mediaRecorder;
+    let chunks = [];
+
+    document.getElementById("recordBtn").onclick = async () => {
+      const btn = document.getElementById("recordBtn");
+
+      if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+
+        mediaRecorder.onstop = async () => {
+          btn.classList.remove("recording");
+
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          chunks = [];
+
+          const file = new File([blob], "recording.webm");
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const res = await fetch("/upload", {
+            method: "POST",
+            body: formData
+          });
+
+          if (res.ok) {
+            showSuccessPopup();   // SHOW POPUP WHEN SUCCESSFUL
+          }
+        };
+
+        mediaRecorder.start();
+        btn.classList.add("recording");
+
+      } else {
+        mediaRecorder.stop();
+      }
+    };
+  </script>
+</body>
+</html>
