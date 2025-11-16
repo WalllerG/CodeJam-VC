@@ -43,9 +43,9 @@ Success animations and clean UI
 
 The goal is to offer a smooth, fast, and delightful experience — no typing required.
 
-<img width="653" height="526" alt="Screenshot 2025-11-16 at 5 12 57 PM" src="https://github.com/user-attachments/assets/7a2c0af1-d066-4b70-bae8-69095b95c48f" />
+<img width="739" height="517" alt="Screenshot 2025-11-16 at 5 52 51 PM" src="https://github.com/user-attachments/assets/1533d765-2491-42f9-9875-8877cd434fbc" />
 
-_________________________________________________________________________________________________________________________________________________
+_______________________________________________________________________________________________________________________________________________
 
 TRY IT!
 
