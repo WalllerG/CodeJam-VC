@@ -11,7 +11,7 @@ from googleapiclient.discovery import build
 app = FastAPI()
 
 # Serve static files
-app.mount("/static", StaticFiles(directory="/Users/walter/Desktop/CodeJam-VC/CodeJam-Frontend"), name="static")
+app.mount("/static", StaticFiles(directory="/CodeJam-VC/CodeJam-Frontend"), name="static")
 
 # Redirect root to homepage
 @app.get("/")
