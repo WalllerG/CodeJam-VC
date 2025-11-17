@@ -49,7 +49,7 @@ ________________________________________________________________________________
 
 TRY IT!
 
-git clone https://github.com/WalllerG/CodeJam-VC/tree/main/CodeJam-VC
+git clone https://github.com/WalllerG/CodeJam-VC
 
 1.Install Python Dependencies
 We used Python 3.9.9 and PyTorch 1.10.1 to train and test our models, but the codebase is expected to be compatible with Python 3.8-3.11 and
