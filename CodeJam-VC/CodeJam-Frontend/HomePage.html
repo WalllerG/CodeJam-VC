@@ -4,98 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoiceCal</title>
-    <link rel="stylesheet" href="/static/HomePage.css">
-    <script src="https://kit.fontawesome.com/d5e922ec28.js" crossorigin="anonymous"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script>
-    const GOOGLE_CLIENT_ID = "31860016884-kj5edhvld3ujudmjr9pl3j1oaddnv63d.apps.googleusercontent.com";
-
-window.onload = function () {
-  const loginButton = document.getElementById("login-button");
-
-  if (loginButton) {
-    loginButton.addEventListener("click", () => {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse,
-      });
-      google.accounts.id.prompt();
-    });
-  }
-};
-
-function handleCredentialResponse(response) {
-  console.log("Encoded JWT ID token: " + response.credential);
-  // You can decode the token and handle login here
-}
-    </script>
+    <meta name="description" content="Schedule your events with just your voice.">
+    <link rel="icon" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="voicecal.css">
 </head>
 
-
-
 <body>
- <div class="background">
-        <header>
-            <div class="icon-container">
-                <i class="fa-solid fa-microphone" style="color: white; font-size: 35px;"></i>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+        <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    </svg>
+
+    <header class="nav">
+        <a class="brand" href="HomePage.html">
+            <span class="brand-icon"><svg class="icon"><use href="#i-mic"/></svg></span>
+            <span class="brand-name">VoiceCal</span>
+        </a>
+        <nav class="nav-links" aria-label="Main">
+            <a class="nav-link" href="HomePage.html" aria-current="page"><svg class="icon"><use href="#i-home"/></svg><span>Home</span></a>
+            <a class="nav-link" href="mic.html"><svg class="icon"><use href="#i-mic"/></svg><span>Speak</span></a>
+            <a class="nav-link" href="https://calendar.google.com/calendar/u/0/r/week" target="_blank" rel="noopener"><svg class="icon"><use href="#i-calendar"/></svg><span>Calendar</span></a>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <section class="hero-copy">
+            <span class="status-pill" id="status">Checking server…</span>
+            <h1>Welcome to <span class="gradient-text">VoiceCal</span></h1>
+            <p class="lead">Schedule your events with just your voice. Simply speak, review, and we'll add it to your calendar.</p>
+            <div class="cta-row">
+                <a class="btn btn-primary" href="mic.html"><svg class="icon"><use href="#i-mic"/></svg>Start speaking</a>
+                <a class="btn btn-ghost" href="https://calendar.google.com/calendar/u/0/r/week" target="_blank" rel="noopener"><svg class="icon"><use href="#i-calendar"/></svg>Open Google Calendar</a>
             </div>
-            <div class="title-left">VoiceCal </div>
-            <div class="icons2">
-                <button class="home1"><i class="fa-solid fa-house" style="font-size: 50px; color:white; margin-left: 2%;"></i></button>
-                <button class="mic2" onclick="window.location.href='mic.html'" ><i class="fa-solid fa-microphone" style="font-size: 50px; color:white; margin-left: 40%;"></i></button>
-                <a href="https://calendar.google.com/calendar/u/0/r/week" class="calender1"><i class="fa-solid fa-calendar" style="font-size: 50px; color:white; margin-left: 40%; padding-left: 45%;"></i></a>
+            <div class="examples">
+                <span class="examples-label">Try saying</span>
+                <ul class="example-list">
+                    <li><a class="example-chip" href="mic.html?text=Dinner%20with%20Alex%20tomorrow%20at%207%20pm">“Dinner with Alex tomorrow at 7 pm”</a></li>
+                    <li><a class="example-chip" href="mic.html?text=Gym%20on%20Monday%20from%206%20to%207%3A30%20am">“Gym on Monday from 6 to 7:30 am”</a></li>
+                    <li><a class="example-chip" href="mic.html?text=Study%20session%20Friday%20at%202%20pm%20for%203%20hours%2C%20then%20dinner">“Study Friday at 2 for 3 hours, then dinner”</a></li>
+                </ul>
             </div>
-        </header>
+        </section>
 
-        <div class="left-main-section">
-            <p class="paragraph">Welcome To VoiceCal Scheduler</p>
-            <p class="bottom-paragraph">Schedule your events with just your voice!
-                Simply speak, and we"ll add it to your calender.</p>
+        <a class="logo-orb" href="mic.html" aria-label="Start speaking">
+            <img src="logo.png" alt="VoiceCal logo">
+        </a>
+    </main>
 
+    <ol class="steps">
+        <li class="step">
+            <span class="step-icon"><svg class="icon"><use href="#i-mic"/></svg></span>
+            <h2>Speak naturally</h2>
+            <p>Say one event or a whole day — “gym at 7, then lunch with Sam at noon”.</p>
+        </li>
+        <li class="step">
+            <span class="step-icon"><svg class="icon"><use href="#i-list"/></svg></span>
+            <h2>Review your schedule</h2>
+            <p>Check the times VoiceCal understood and fix anything before it's saved.</p>
+        </li>
+        <li class="step">
+            <span class="step-icon"><svg class="icon"><use href="#i-check"/></svg></span>
+            <h2>Add to Google Calendar</h2>
+            <p>One tap adds everything, and events already on your calendar are skipped.</p>
+        </li>
+    </ol>
 
-            <div class="right-section">
-                <div class="logo-background"> <a class="same-button" href="mic.html"></button><img class="company-logo" src="logo.png" alt="vc"></a></div>
-                <div class="Sign-In-Cover">
-                <button class="Sign-In-Button"></button>
-            </div>
-            </div>
-        </div>
-
-    </div>
-</body>
-   <script>
-    const GOOGLE_CLIENT_ID = "31860016884-nr4kgcvtpkj9iib9r1cog4a4ljos8uil.apps.googleusercontent.com.apps.googleusercontent.com";
-    let googleAccessToken = null;
-
-    window.onload = function() {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse,
-      });
-
-      google.accounts.id.renderButton(
-        document.getElementById("Sign-In-Button"),
-        { theme: "outline", size: "large" }
-      );
-
-      google.accounts.id.prompt(); // show prompt automatically
-    };
-
-    function handleCredentialResponse(response) {
-      // Send ID token to backend to exchange for access token
-      fetch("/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_token: response.credential })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log("Access Token from backend:", data.access_token);
-        googleAccessToken = data.access_token;
-        document.getElementById("microphone-section").style.display = "block";
-        document.getElementById("Sign-In-Button").style.display = "none";
-      });
-    }
+    <script>
+        (async function checkServer() {
+            const pill = document.getElementById("status");
+            try {
+                const res = await fetch("/api/health");
+                if (!res.ok) throw new Error(res.statusText);
+                const health = await res.json();
+                pill.dataset.state = health.calendar_connected ? "ok" : "warn";
+                pill.textContent = health.calendar_connected ? "Google Calendar connected" : "Google Calendar not connected";
+                if (!health.calendar_connected) pill.title = "Run quickstart.py in the CodeJam-Backend folder, then restart the server.";
+            } catch {
+                pill.dataset.state = "error";
+                pill.textContent = "Server offline";
+                pill.title = "Start it with: uvicorn demo:app --reload";
+            }
+        })();
     </script>
 </body>
 </html>

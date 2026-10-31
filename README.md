@@ -119,17 +119,31 @@ To make sure, there should be a token.json file in your Backend folder as well
 
 ________________________________________________________________________________________________________________________________________________
 
-Now, you can go to your google cloud account
+No client ID needs to be pasted into the frontend any more: the server uses token.json directly, and the
+status pill at the top of the page tells you whether Google Calendar is connected.
 
-In the API and Service Page --> Press Credentials --> Press your Program name 
-and you should be able to see Your User ID
-1.Copy past the ID and then Open the HomePage.html file, at line 11 replace the const GOOGLE_CLIENT_ID with your own Client ID
+credentials.json and token.json are listed in .gitignore - never commit them.
 
-<img width="338" height="25" alt="Screenshot 2025-11-16 at 5 32 51 PM" src="https://github.com/user-attachments/assets/9f51b306-69fe-42dc-924b-0c9f82a62c72" />
+All Python dependencies can also be installed in one go:
 
-And do the SAME for line 67
+pip install -r CodeJam-VC/CodeJam-Backend/requirements.txt
 
-<img width="424" height="21" alt="Screenshot 2025-11-16 at 5 34 07 PM" src="https://github.com/user-attachments/assets/7ef9dbf6-13a0-47a5-8105-25d3504d10bc" />
+________________________________________________________________________________________________________________________________________________
+
+HOW THE SCHEDULE BUILDER WORKS
+
+1. Tap the microphone (or press Space) and say one or more events, e.g.
+   "Gym tomorrow at 7 am and lunch with Sam at noon at Joe's, then study for 2 hours".
+   You can also type the same thing in the "or type it" box.
+2. VoiceCal turns it into events in "Your schedule". Anything it had to guess (no time given, AM vs PM,
+   a date that doesn't exist...) is highlighted so you can fix it. You can edit, remove, or add events by hand.
+3. Press "Add to Google Calendar". Events already on your calendar are skipped instead of duplicated.
+
+Run the parser tests with:
+
+cd CodeJam-VC/CodeJam-Backend
+
+python -m pytest test_parser.py
 
 ________________________________________________________________________________________________________________________________________________
 
