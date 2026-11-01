@@ -389,6 +389,8 @@ async function checkServer() {
     }
     if (!health.speech_installed) {
       disableMic("Voice input isn't set up on the server yet — type your events below instead.");
+    } else if (health.ffmpeg_installed === false) {
+      disableMic("The server needs ffmpeg to understand recordings (winget install ffmpeg) — type your events below for now.");
     }
   } catch {
     els.status.dataset.state = "error";

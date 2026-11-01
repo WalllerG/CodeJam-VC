@@ -14,6 +14,8 @@ and the original one-shot POST /upload is kept for older clients.
 import importlib.util
 import logging
 import os
+import shutil
+import sys
 import tempfile
 import threading
 from contextlib import asynccontextmanager
@@ -95,7 +97,28 @@ def warm_up_whisper():
         threading.Thread(target=load, daemon=True).start()
 
 
+def find_ffmpeg():
+    """Whisper shells out to ffmpeg. If it was installed after this terminal opened, reload PATH from Windows."""
+    if shutil.which("ffmpeg"):
+        return True
+    if sys.platform == "win32":
+        import winreg
+        extra = []
+        for root, key in ((winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"),
+                          (winreg.HKEY_CURRENT_USER, "Environment")):
+            try:
+                with winreg.OpenKey(root, key) as handle:
+                    extra.append(os.path.expandvars(winreg.QueryValueEx(handle, "Path")[0]))
+            except OSError:
+                continue
+        os.environ["PATH"] = os.pathsep.join([os.environ.get("PATH", "")] + extra)
+    return shutil.which("ffmpeg") is not None
+
+
 def transcribe_audio(data, suffix):
+    if not find_ffmpeg():
+        raise HTTPException(503, "ffmpeg is missing on the server, so audio can't be decoded. "
+                                 "Install it (winget install ffmpeg) and restart the server.")
     model = get_whisper_model()
     fd, path = tempfile.mkstemp(prefix="voicecal-", suffix=suffix)
     try:
@@ -305,6 +328,7 @@ def health():
     return {
         "speech_installed": importlib.util.find_spec("whisper") is not None,
         "speech_ready": _model is not None,
+        "ffmpeg_installed": find_ffmpeg(),
         "calendar_connected": TOKEN_PATH.exists(),
         "max_events": MAX_EVENTS,
         "max_text_length": MAX_TEXT_LENGTH,
