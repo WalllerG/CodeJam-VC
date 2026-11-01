@@ -244,6 +244,63 @@ button {
     background: var(--danger);
 }
 
+/* ---------- Account (Google sign-in) ---------- */
+
+.account {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.btn-google {
+    background: #ffffff;
+    color: #1f1f1f;
+    box-shadow: 0 8px 24px rgba(20, 0, 50, 0.3);
+}
+
+.btn-google:hover:not(:disabled) {
+    background: #f1f1f4;
+}
+
+.icon-google {
+    width: 18px;
+    height: 18px;
+    stroke: none;
+}
+
+.account-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    max-width: 240px;
+    padding: 4px 12px 4px 4px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--glass);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.account-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* ---------- Buttons ---------- */
 
 .btn {
@@ -1095,8 +1152,14 @@ kbd {
 
     .nav-link span,
     .brand-name,
-    .app-chip-label {
+    .app-chip-label,
+    .google-label-long,
+    .account-email {
         display: none;
+    }
+
+    .account-chip {
+        padding: 4px;
     }
 
     .app-chip {

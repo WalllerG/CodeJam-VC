@@ -18,9 +18,17 @@ const RECORDING_FORMATS = [
   ["audio/ogg;codecs=opus", ".ogg"],
 ];
 
+const SIGN_IN_FLAG = "voicecal.signingIn";
+const AUTH_ERRORS = {
+  denied: "You cancelled the Google sign-in, so nothing was added.",
+  expired: "The sign-in took too long or was started in another tab. Please try again.",
+  calendar_scope: "VoiceCal needs permission to add events. Sign in again and tick the Google Calendar box.",
+  failed: "Google sign-in didn't work. Please try again.",
+};
+
+const account = window.VoiceCalAccount;
 const $ = (id) => document.getElementById(id);
 const els = {
-  status: $("status"),
   subtitle: $("subtitle"),
   ring: $("recordRing"),
   recordBtn: $("recordBtn"),
@@ -138,7 +146,12 @@ function validate(item) {
 function loadSchedule() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return Array.isArray(saved) ? saved.filter((item) => item && typeof item.id === "string") : [];
+    if (!Array.isArray(saved)) return [];
+    const now = new Date(); // computed inline: this runs before the date helpers below are defined
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    // Drop abandoned drafts: unsaved cards that never got a name and whose day is already over
+    return saved.filter((item) => item && typeof item.id === "string"
+      && !(item.status !== "created" && !String(item.activity || "").trim() && item.date && item.date < today));
   } catch {
     return [];
   }
@@ -196,11 +209,12 @@ function updateChrome() {
   const pending = pendingItems().length;
   els.count.textContent = String(schedule.length);
   els.emptyState.hidden = schedule.length > 0;
+  const needsSignIn = account.state.configured && !account.state.signedIn;
   els.clearBtn.disabled = schedule.length === 0 || saving;
-  els.saveBtn.disabled = pending === 0 || saving || busy;
-  els.saveLabel.textContent = saving
-    ? "Adding…"
-    : pending > 0 ? `Add ${plural(pending, "event")} to Google Calendar` : "Add to Google Calendar";
+  els.saveBtn.disabled = pending === 0 || saving || busy || !account.state.online || !account.state.configured;
+  if (saving) els.saveLabel.textContent = "Adding…";
+  else if (needsSignIn) els.saveLabel.textContent = "Sign in to add to Google Calendar";
+  else els.saveLabel.textContent = pending > 0 ? `Add ${plural(pending, "event")} to Google Calendar` : "Add to Google Calendar";
   els.addManual.disabled = schedule.length >= MAX_SCHEDULE_SIZE;
 }
 
@@ -375,28 +389,22 @@ async function request(url, options = {}) {
   } catch {
     // non-JSON error page
   }
-  if (!res.ok) throw new Error(errorDetail(data) || `Something went wrong on the server (${res.status}).`);
+  if (!res.ok) {
+    const error = new Error(errorDetail(data) || `Something went wrong on the server (${res.status}).`);
+    error.status = res.status;
+    throw error;
+  }
   return data;
 }
 
-async function checkServer() {
-  try {
-    const health = await request("/api/health");
-    els.status.dataset.state = health.calendar_connected ? "ok" : "warn";
-    els.status.textContent = health.calendar_connected ? "Calendar connected" : "Calendar not connected";
-    if (!health.calendar_connected) {
-      els.status.title = "Run quickstart.py in the CodeJam-Backend folder, then restart the server.";
-    }
-    if (!health.speech_installed) {
-      disableMic("Voice input isn't set up on the server yet — type your events below instead.");
-    } else if (health.ffmpeg_installed === false) {
-      disableMic("The server needs ffmpeg to understand recordings (winget install ffmpeg) — type your events below for now.");
-    }
-  } catch {
-    els.status.dataset.state = "error";
-    els.status.textContent = "Server offline";
-    els.status.title = "Start it with: uvicorn demo:app --reload";
+function applyServerState(state) {
+  const health = state.health;
+  if (health && !health.speech_installed) {
+    disableMic("Voice input isn't set up on the server yet — type your events below instead.");
+  } else if (health && health.ffmpeg_installed === false) {
+    disableMic("The server needs ffmpeg to understand recordings (winget install ffmpeg) — type your events below for now.");
   }
+  updateChrome();
 }
 
 async function runParse(send, label) {
@@ -458,6 +466,17 @@ async function saveSchedule() {
   const pending = pendingItems();
   if (pending.length === 0) return;
 
+  if (!account.state.signedIn) {
+    // The schedule is already saved in this browser, so it is still here after Google sends the user back
+    try {
+      sessionStorage.setItem(SIGN_IN_FLAG, "1");
+    } catch {
+      // only used for the welcome-back message
+    }
+    account.signIn();
+    return;
+  }
+
   const invalid = pending.filter((item) => Object.keys(validate(item)).length > 0);
   if (invalid.length) {
     invalid.forEach((item) => (item.showErrors = true));
@@ -496,6 +515,7 @@ async function saveSchedule() {
     }
   } catch (err) {
     showNotice(err.message, "error");
+    if (err.status === 401) account.refresh(); // signed out or access revoked: show the sign-in button again
   } finally {
     saving = false;
     pending.forEach((item) => delete item.showErrors);
@@ -728,12 +748,37 @@ if (!canRecord()) {
 }
 
 render();
-checkServer();
+account.onChange(applyServerState);
+applyServerState(account.state);
+
+const params = new URLSearchParams(window.location.search);
+if (params.has("text") || params.has("auth_error")) {
+  history.replaceState(null, "", window.location.pathname);
+}
+
+// Coming back from Google's sign-in page
+const authError = params.get("auth_error");
+let returningFromSignIn = false;
+try {
+  returningFromSignIn = sessionStorage.getItem(SIGN_IN_FLAG) === "1";
+  sessionStorage.removeItem(SIGN_IN_FLAG);
+} catch {
+  // storage unavailable: skip the welcome-back message
+}
+if (authError) {
+  showNotice(AUTH_ERRORS[authError] || AUTH_ERRORS.failed, "error");
+} else if (returningFromSignIn) {
+  account.ready.then((state) => {
+    if (state.signedIn && pendingItems().length) {
+      showToast(`✔ Signed in as ${state.email || "your Google account"}`);
+      els.subtitle.textContent = "You're signed in — press “Add to Google Calendar” to save your events";
+    }
+  });
+}
 
 // Example links on the home page open this page with ?text=...
-const prefill = new URLSearchParams(window.location.search).get("text");
+const prefill = params.get("text");
 if (prefill) {
-  history.replaceState(null, "", window.location.pathname);
   els.textInput.value = prefill;
   parseText(prefill);
 }

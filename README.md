@@ -103,26 +103,19 @@ Choose the Download Json button and then rename the file to credentials.json
 
 Place it in your backend folder
 
-GO to the Scopes page
-
-Add scopes and click the first free scopes that show on the page and search calendar then add the first one shows in the result as well
-
-The one you search should be like this: https://www.googleapis.com/auth/calenda
-
-BEFORE TO RUN THIS PROGRAM, WE NEED TO RUN the file quickstart.py once. The file is in your CodeJam-Backend Folder
-It will take you to the google login page to make sure you authenticate the page
-Once you successfully ran it you should see a page like this:
-
-<img width="1470" height="956" alt="Screenshot 2025-11-16 at 5 21 06 PM" src="https://github.com/user-attachments/assets/a38fa7cf-87ca-4d3d-b970-9b29ca872da6" />
-
-To make sure, there should be a token.json file in your Backend folder as well
+Go to Google Auth Platform -> Audience -> Test users and add the Gmail address of everyone who will sign in
+(including yourself). While the app is in "Testing" mode, nobody else can sign in.
 
 ________________________________________________________________________________________________________________________________________________
 
-No client ID needs to be pasted into the frontend any more: the server uses token.json directly, and the
-status pill at the top of the page tells you whether Google Calendar is connected.
+Each person who uses VoiceCal signs in with their own Google account ("Sign in with Google" at the top of
+the page) and events go into their own calendar. The server only needs credentials.json in the
+CodeJam-Backend folder.
 
-credentials.json and token.json are listed in .gitignore - never commit them.
+While your Google Cloud app is in "Testing" mode, only the accounts listed under
+Google Auth Platform -> Audience -> Test users can sign in (up to 100). Add your friends' Gmail addresses there.
+
+credentials.json and the .sessions folder (people's sign-ins) are listed in .gitignore - never commit them.
 
 All Python dependencies can also be installed in one go:
 
@@ -137,7 +130,8 @@ HOW THE SCHEDULE BUILDER WORKS
    You can also type the same thing in the "or type it" box.
 2. VoiceCal turns it into events in "Your schedule". Anything it had to guess (no time given, AM vs PM,
    a date that doesn't exist...) is highlighted so you can fix it. You can edit, remove, or add events by hand.
-3. Press "Add to Google Calendar". Events already on your calendar are skipped instead of duplicated.
+3. Press "Add to Google Calendar" (you'll be asked to sign in with Google the first time).
+   Events already on your calendar are skipped instead of duplicated.
 
 Run the parser tests with:
 
